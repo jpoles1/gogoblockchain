@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//Main blockchain routing
 func mine(w http.ResponseWriter, r *http.Request) {
 	lastBlock := servBlockchain.lastBlock()
 	lastProof := lastBlock.Proof
@@ -67,4 +68,12 @@ func newTransaction(w http.ResponseWriter, r *http.Request) {
 	}
 	index := servBlockchain.newTransaction(sender[0], receiver[0], amountNum)
 	w.Write([]byte("Transaction will be added to Block: " + strconv.Itoa(index)))
+}
+
+//Multinode routing
+func registerNode(w http.ResponseWriter, r *http.Request) {
+
+}
+func resolveNode(w http.ResponseWriter, r *http.Request) {
+
 }

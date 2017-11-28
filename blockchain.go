@@ -8,27 +8,6 @@ import (
 	"time"
 )
 
-//Transaction is a struct to contain a blockchain transaction object
-type Transaction struct {
-	Sender     string
-	Receipient string
-	Amount     int
-}
-
-//Block is a struct to contain a blockchain transaction object
-type Block struct {
-	Index        int
-	Timestamp    int64
-	Transactions []Transaction
-	Proof        int
-	PreviousHash string
-}
-
-func (b Block) hash() string {
-	blockstr := fmt.Sprint(b)
-	return shaHash(blockstr)
-}
-
 //BlockChain is a struct to contain an instance of the blockchain
 type BlockChain struct {
 	CurrentTransactions []Transaction
