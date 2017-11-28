@@ -33,8 +33,6 @@ func (b Block) hash() string {
 type BlockChain struct {
 	CurrentTransactions []Transaction
 	Chain               []Block
-	PreviousHash        string
-	Proof               int
 }
 
 func (bc BlockChain) start() BlockChain {
