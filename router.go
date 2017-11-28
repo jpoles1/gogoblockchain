@@ -34,7 +34,7 @@ func mine(w http.ResponseWriter, r *http.Request) {
 
 func fetchChain(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(servBlockchain)
-	jsontxt, err := json.Marshal(servBlockchain)
+	jsontxt, err := json.Marshal(servBlockchain.Chain)
 	if err != nil {
 		fmt.Println(err)
 		return
