@@ -21,6 +21,7 @@ type BlockChain struct {
 
 func (bc BlockChain) start() BlockChain {
 	bc.newBlock(100, "1")
+	bc.Nodes = NodeSet{make(map[Node]bool)}
 	return bc
 }
 func (bc BlockChain) validProof(lastProof int, proof int) bool {
@@ -89,9 +90,10 @@ func (bc *BlockChain) resolveConflicts() bool {
 	for otherNode := range bc.Nodes.set {
 		fmt.Println(otherNode)
 		nodeResp, err := http.Get("http://" + otherNode.addr + "/chain")
-		if err != nil || nodeResp.StatusCode != 200 {
+		if err != nil {
 			color.Yellow("Cannot get chain data from: ")
 			fmt.Println(otherNode)
+			fmt.Println(err)
 		} else {
 			defer nodeResp.Body.Close()
 			resp, err := ioutil.ReadAll(nodeResp.Body)
