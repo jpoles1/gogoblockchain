@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -57,19 +58,20 @@ func (bc BlockChain) lastBlock() Block {
 	//Returns the last Block in the chain
 	return bc.Chain[len(bc.Chain)-1]
 }
-func (bc *BlockChain) registerNode(address string) {
-	uri, _ := url.Parse(address)
-	fmt.Println(uri)
-	//bc.Nodes.add(Node{uri.})
+func (bc *BlockChain) registerNode(address string) (string, error) {
+	uri, err := url.Parse(address)
+	if err != nil {
+		return "", err
+	}
+	bc.Nodes.add(Node{uri.Host})
+	return uri.Host, err
 }
 func (bc BlockChain) validChain(blocks []Block) bool {
 	prevBlock := blocks[0]
 	i := 1
-	fmt.Println("Validating Chain")
+	log.Println("Validating Chain")
 	for i < len(blocks) {
 		block := blocks[i]
-		fmt.Println(prevBlock)
-		fmt.Println(block)
 		//Check that the hash of the block is correct
 		if block.PreviousHash != prevBlock.hash() {
 			return false
@@ -78,7 +80,6 @@ func (bc BlockChain) validChain(blocks []Block) bool {
 		if !bc.validProof(prevBlock.Proof, block.Proof) {
 			return false
 		}
-		fmt.Println("-----------")
 		prevBlock = block
 		i++
 	}
@@ -88,24 +89,22 @@ func (bc *BlockChain) resolveConflicts() bool {
 	maxLength := len(bc.Chain)
 	var newChain []Block
 	for otherNode := range bc.Nodes.set {
-		fmt.Println(otherNode)
 		nodeResp, err := http.Get("http://" + otherNode.addr + "/chain")
 		if err != nil {
 			color.Yellow("Cannot get chain data from: ")
 			fmt.Println(otherNode)
-			fmt.Println(err)
+			log.Println("Error: " + err.Error())
 		} else {
 			defer nodeResp.Body.Close()
 			resp, err := ioutil.ReadAll(nodeResp.Body)
 			if err != nil {
-				fmt.Println("HTTP Read Error")
+				log.Println("HTTP Read Error: " + err.Error())
 			} else {
 				var jsonChain []Block
 				if err := json.Unmarshal(resp, &jsonChain); err != nil {
 					color.Yellow("Corrupted chain data from: ")
 					fmt.Println(otherNode)
-					fmt.Println(err)
-					fmt.Println("--------------")
+					log.Println("Error: " + err.Error())
 				} else if len(jsonChain) > maxLength && bc.validChain(jsonChain) {
 					maxLength = len(jsonChain)
 					newChain = jsonChain
