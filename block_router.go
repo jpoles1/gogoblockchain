@@ -2,11 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 //Main blockchain routing
@@ -26,26 +24,22 @@ func mine(w http.ResponseWriter, r *http.Request) {
 	}
 	jsontxt, err := json.Marshal(response)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Error: " + err.Error())
 		return
 	}
 	w.Write(jsontxt)
-	fmt.Println(proof)
 }
 
 func fetchChain(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(servBlockchain)
 	jsontxt, err := json.Marshal(servBlockchain.Chain)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Error: " + err.Error())
 		return
 	}
 	w.Write(jsontxt)
 }
 
 func newTransaction(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	fmt.Println(params)
 	sender, ok := r.URL.Query()["sender"]
 	if !ok || len(sender) < 1 {
 		http.Error(w, "Err 400: URL Param 'sender' is missing", 400)

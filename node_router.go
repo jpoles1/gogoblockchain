@@ -1,22 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 //Multinode routing
 func registerNode(w http.ResponseWriter, r *http.Request) {
+	//Parse/clean urls from GET?
 	addr, ok := r.URL.Query()["addr"]
-	fmt.Println(addr)
 	if !ok || len(addr) < 1 {
 		http.Error(w, "Err 400: URL Param 'addr' is missing", 400)
 		return
 	}
-	fmt.Println(servBlockchain.Nodes)
-	servBlockchain.Nodes.add(Node{addr[0]})
-	fmt.Println(servBlockchain.Nodes)
-	w.Write([]byte("Added new blockchain node: " + addr[0]))
+	uri, err := servBlockchain.registerNode(addr[0])
+	if err != nil {
+		w.Write([]byte("Error: " + err.Error()))
+		return
+	}
+	w.Write([]byte("Added new blockchain node: " + uri))
 }
 func resolveNode(w http.ResponseWriter, r *http.Request) {
 	msg := "Our chain is authoritative"
