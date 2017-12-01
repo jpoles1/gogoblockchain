@@ -2,7 +2,6 @@ package main
 
 //Transaction is a struct to contain a blockchain transaction object
 type Transaction struct {
-	Sender     string
-	Receipient string
-	Amount     int
+	VoterID string
+	Vote    string
 }

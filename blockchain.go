@@ -51,8 +51,8 @@ func (bc *BlockChain) newBlock(proof int, prevHash string) Block {
 	bc.Chain = append(bc.Chain, newblock)
 	return newblock
 }
-func (bc *BlockChain) newTransaction(sender string, recipient string, amount int) int {
-	bc.CurrentTransactions = append(bc.CurrentTransactions, Transaction{sender, recipient, amount})
+func (bc *BlockChain) newTransaction(t Transaction) int {
+	bc.CurrentTransactions = append(bc.CurrentTransactions, t)
 	return len(bc.CurrentTransactions)
 }
 func (bc BlockChain) lastBlock() Block {
