@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -62,6 +63,15 @@ func (bc *BlockChain) registerNode(address string) (string, error) {
 	uri, err := url.Parse(address)
 	if err != nil {
 		return "", err
+	}
+	if uri.Host == "" {
+		if destReachable(address) {
+			return address, nil
+		}
+		return "", errors.New("Address is Invalid or Cannot Be Reached")
+	}
+	if !destReachable(uri.Host) {
+		return "", errors.New("Cannot fetch chain from this server")
 	}
 	bc.Nodes.add(Node{uri.Host})
 	return uri.Host, err
