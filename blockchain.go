@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 
 	"github.com/fatih/color"
@@ -26,17 +25,20 @@ func (bc BlockChain) start() BlockChain {
 	bc.Nodes = NodeSet{make(map[Node]bool)}
 	return bc
 }
-func (bc BlockChain) validProof(lastProof int, proof int) bool {
-	guess := strconv.Itoa(lastProof) + strconv.Itoa(proof)
-	guessHash := shaHash(guess)
-	fmt.Println("Validating...", guessHash)
-	return guessHash[:2] == "00"
-}
+
 func (bc BlockChain) proofOfWork(lastProof int) int {
-	proof := 0
-	for bc.validProof(lastProof, proof) == false {
-		proof++
+	defer trackTime(time.Now(), "Proof of Work")
+	nworkers := 250
+	bs := BlockSolver{}
+	bs.init(nworkers, lastProof)
+	index := 1
+	for i := 1; i <= nworkers; i++ {
+		bs.proofQueue <- index
+		go bs.proofOfWorker(i)
+		index++
 	}
+	proof := <-bs.proofChan
+	fmt.Printf("Found solution at proof = %d \n", proof)
 	return proof
 }
 func (bc *BlockChain) newBlock(proof int, prevHash string) Block {
@@ -87,7 +89,7 @@ func (bc BlockChain) validChain(blocks []Block) bool {
 			return false
 		}
 		//Check that the Proof of Work is correct
-		if !bc.validProof(prevBlock.Proof, block.Proof) {
+		if !validProof(prevBlock.Proof, block.Proof) {
 			return false
 		}
 		prevBlock = block
