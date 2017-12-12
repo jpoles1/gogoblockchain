@@ -2,7 +2,7 @@
   <h1>Welcome to BlockVote</h1>
   <hr style="margin-bottom: 100px;">
   <div class="jumbotron" style="width: 50%; margin: auto; padding: 30px;">
-    <form action="/transactions/new">
+    <form action="/castvote">
       Voter ID:
       <br>
       <input type="text" name="voterid" style="text-align: center; margin-top: 8px;"></input>
@@ -16,6 +16,7 @@
         </div>
       {{/each}}
       <br>
+      <input type="hidden" name="pollid" value="{{pollID}}">
       <button class="btn btn-primary" type="submit">Submit Vote</button>
     </form>
   </div>

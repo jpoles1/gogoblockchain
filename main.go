@@ -23,17 +23,12 @@ func main() {
 		panic("While parsing the template files: " + err.Error())
 	}
 	//Request routing
-
 	router := mux.NewRouter()
 	//UI routing
-	router.HandleFunc("/", votePage).Methods("GET")
+	router.HandleFunc("/", homePage).Methods("GET")
+	router.HandleFunc("/vote/{pollID:[0-9]+}", pollPage).Methods("GET")
 	//Main blockchain routing
-	router.HandleFunc("/transactions/new", newTransaction).Methods("GET")
-	router.HandleFunc("/chain", fetchChain).Methods("GET")
-	router.HandleFunc("/mine", mine).Methods("GET")
-	//Multinode routing
-	router.HandleFunc("/nodes/register", registerNode).Methods("GET")
-	router.HandleFunc("/nodes/resolve", resolveNode).Methods("GET")
+	router.HandleFunc("/castvote", voteAPI).Methods("GET")
 	//Start the engines
 	portPtr := flag.String("p", "3333", "Server Port")
 	flag.Parse()

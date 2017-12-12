@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/fatih/color"
@@ -18,11 +19,15 @@ type BlockChain struct {
 	CurrentTransactions []Transaction
 	Chain               []Block
 	Nodes               NodeSet
+	nowMining           *sync.Mutex
+	minerWaiting        bool
 }
 
 func (bc BlockChain) start() BlockChain {
 	bc.newBlock(100, "1")
 	bc.Nodes = NodeSet{make(map[Node]bool)}
+	bc.minerWaiting = false
+	bc.nowMining = &sync.Mutex{}
 	return bc
 }
 
@@ -40,6 +45,29 @@ func (bc BlockChain) proofOfWork(lastProof int) int {
 	proof := <-bs.proofChan
 	fmt.Printf("Found solution at proof = %d \n", proof)
 	return proof
+}
+
+//Only mine if: another miner is not already queued; vote is queued and 5 minutes has passed; 5 or more transactions waiting
+//Defer mining if: above and miner is already already working
+func (bc *BlockChain) tryToMine() {
+	if !bc.minerWaiting {
+		fmt.Println("Queueing A Miner")
+		bc.minerWaiting = true
+		bc.mineBlock()
+	} else {
+		fmt.Println("Skipping Miner, One Already Queued")
+	}
+}
+func (bc *BlockChain) mineBlock() {
+	bc.nowMining.Lock()
+	fmt.Println("Starting Miner")
+	bc.minerWaiting = false
+	lastBlock := bc.lastBlock()
+	lastProof := lastBlock.Proof
+	proof := bc.proofOfWork(lastProof)
+	previousHash := lastBlock.hash()
+	bc.newBlock(proof, previousHash)
+	bc.nowMining.Unlock()
 }
 func (bc *BlockChain) newBlock(proof int, prevHash string) Block {
 	var newblock = Block{
