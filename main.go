@@ -10,11 +10,17 @@ import (
 	template "github.com/kataras/go-template"
 	"github.com/kataras/go-template/handlebars"
 	uuid "github.com/satori/go.uuid"
+	"github.com/subosito/gotenv"
 )
 
 var servBlockchain = BlockChain{}.start()
 var nodeIdentifier = uuid.NewV4().String()
 
+func init() {
+	gotenv.Load()
+	mongoLoad()
+	getPolls()
+}
 func main() {
 	// Process handlebars templates
 	template.AddEngine(handlebars.New()).Directory("./views", ".hbs")
@@ -24,9 +30,12 @@ func main() {
 	}
 	//Request routing
 	router := mux.NewRouter()
+	//Resources
+	router.PathPrefix("/res").Handler(http.StripPrefix("/res", http.FileServer(http.Dir("res/"))))
 	//UI routing
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/vote/{pollID:[0-9]+}", pollPage).Methods("GET")
+	router.HandleFunc("/newpoll", newpollPage).Methods("GET")
 	//Main blockchain routing
 	router.HandleFunc("/castvote", voteAPI).Methods("GET")
 	//Start the engines
