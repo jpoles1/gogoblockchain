@@ -15,11 +15,12 @@ import (
 
 var servBlockchain = BlockChain{}.start()
 var nodeIdentifier = uuid.NewV4().String()
+var pollDict map[int]Poll
 
 func init() {
 	gotenv.Load()
 	mongoLoad()
-	getPolls()
+	pollDict = pollListToDict(getPolls())
 }
 func main() {
 	// Process handlebars templates

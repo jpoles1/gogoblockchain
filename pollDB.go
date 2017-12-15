@@ -39,10 +39,17 @@ func createPoll(pollDoc Poll) {
 		fmt.Println("Failure to insert poll document:\n", err)
 	}
 }
-func getPolls() {
+func getPolls() []Poll {
 	mongoSesh := mongoDB.Copy()
 	defer mongoSesh.Close()
 	var pollList []Poll
 	mongoSesh.DB("blockvote").C("polls").Find(bson.M{}).All(&pollList)
-	fmt.Println(pollList)
+	return pollList
+}
+func pollListToDict(pollList []Poll) map[int]Poll {
+	pollDict := make(map[int]Poll, len(pollList))
+	for _, pollElem := range pollList {
+		pollDict[pollElem.ID] = pollElem
+	}
+	return pollDict
 }
