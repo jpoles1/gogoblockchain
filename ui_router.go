@@ -25,3 +25,9 @@ func pollPage(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 	}
 }
+func newpollPage(w http.ResponseWriter, r *http.Request) {
+	err := template.ExecuteWriter(w, "newpoll.hbs", map[string]interface{}{}, renderOpts) // yes you can pass simple maps instead of structs
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	}
+}

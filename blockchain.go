@@ -43,7 +43,7 @@ func (bc BlockChain) proofOfWork(lastProof int) int {
 		index++
 	}
 	proof := <-bs.proofChan
-	fmt.Printf("Found solution at proof = %d \n", proof)
+	log.Printf("Found solution at proof = %d \n", proof)
 	return proof
 }
 

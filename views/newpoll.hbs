@@ -1,0 +1,58 @@
+<div id="app" class="jumbotron">
+  <table class="table">
+      <thead>
+          <tr>
+              <td><strong>ID</strong></td>
+              <td><strong>Candidate</strong></td>
+              <td></td>
+          </tr>
+      </thead>
+      <tbody>
+          <tr v-for="(row, index) in rows">
+              <td>\{{index}}</td>
+              <td><input type="text" v-model="row.description"></td>
+              <td>
+                  <button v-on:click="removeElement(index); return false;" style="cursor: pointer" class="btn btn-primary">Remove</button>
+              </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><button class="btn btn-primary" @click="addRow">Add row</button></td>
+            <td></td>
+          </tr>
+      </tbody>
+  </table>
+  <div>
+      <button class="btn btn-primary" @click="submit">Create Poll</button>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var app = new Vue({
+      el: "#app",
+      data: {
+          rows: [{}]
+      },
+      methods: {
+          addRow: function() {
+              var elem = document.createElement('tr');
+              this.rows.push({
+                  title: "",
+                  file: {
+                      name: 'Choose File'
+                  }
+              });
+          },
+          removeElement: function(index) {
+              this.rows.splice(index, 1);
+          },
+          setFilename: function(event, row) {
+              var file = event.target.files[0];
+              row.file = file
+          },
+          submit: function(){
+            
+          }
+      }
+  });
+</script>
