@@ -5,9 +5,24 @@
   <a class="btn btn-primary" role="button" href="newpoll">Create a New Poll</a>
   <hr>
   <h3>Vote on Existing Poll</h3>
-  <div>
-    <input type="text" name="pollID" placeholder="Poll ID" style="margin-bottom: 10px; text-align: center"></input>
+  <div id="joinpoll">
+    <input type="text" v-model="pollID" placeholder="Poll ID" style="margin-bottom: 10px; text-align: center"></input>
     <br>
-    <a class="btn btn-primary" role="button" href="#">Go To Poll</a>
+    <a class="btn btn-primary" role="button" v-bind:href="pollLink()">Go To Poll</a>
   </div>
 </div>
+
+<script type="text/javascript">
+  var app = new Vue({
+      el: "#joinpoll",
+      data: {pollID: ""},
+      methods: {
+        pollLink: function(){
+          if(this.pollID == ""){
+            return "#"
+          }
+          return "vote/"+this.pollID
+        }
+      }
+  });
+</script>
