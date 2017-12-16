@@ -1,4 +1,13 @@
 <div id="app" class="jumbotron">
+  <div style="display: grid">
+    <input type="text" name="pollName" v-model="pollName" v-validate="'required'" style="margin: auto; font-size: 32px; text-align: center;" placeholder="Poll Title">
+    <div style="text-align: center; margin-top: 10px;">
+      <div class="alert alert-danger" v-show="errors.has('pollName')" style="display: inline-block">
+        Give the poll a title.
+      </div>
+    </div>
+  </div>
+  <hr>
   <table class="table">
       <thead>
           <tr>
@@ -10,7 +19,9 @@
       <tbody>
           <tr v-for="(row, index) in rows">
               <td>\{{index}}</td>
-              <td><input type="text" v-model="row.description"></td>
+              <td>
+                <input type="text" v-model="row.name" style="width: 350px;">
+              </td>
               <td>
                   <button v-on:click="removeElement(index); return false;" style="cursor: pointer" class="btn btn-primary">Remove</button>
               </td>
@@ -22,25 +33,31 @@
           </tr>
       </tbody>
   </table>
+  <hr>
+  <div id="errorbox" class="alert alert-danger" role="alert" style="display: none; text-align: center;">
+    <div id="errmsg" style="display: inline"></div>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
   <div>
-      <button class="btn btn-primary" @click="submit">Create Poll</button>
+      <button class="btn btn-primary" @click="submit" :disabled="errors.any()">Create Poll</button>
   </div>
 </div>
 
 <script type="text/javascript">
+  Vue.use(VeeValidate);
   var app = new Vue({
       el: "#app",
       data: {
-          rows: [{}]
+        pollName: "",
+        rows: [{}]
       },
       methods: {
           addRow: function() {
               var elem = document.createElement('tr');
               this.rows.push({
-                  title: "",
-                  file: {
-                      name: 'Choose File'
-                  }
+                  name: undefined,
               });
           },
           removeElement: function(index) {
@@ -50,8 +67,24 @@
               var file = event.target.files[0];
               row.file = file
           },
+          showError(errMsg){
+            $("#errorbox #errmsg").html(errMsg)
+            $("#errorbox").show()
+          },
           submit: function(){
-            
+            var newPollRequest = {
+              "ID": 0,
+              "Name": this.pollName,
+              "Options": this.rows.map(function(x){return x.name}).filter(function(x){return x != undefined})
+            }
+            if(newPollRequest.Name == ""){
+              this.showError("Please name the poll!")
+              return
+            }
+            if(length(newPollRequest.Options) < 1){
+              this.showError("Please name the poll!")
+            }
+            console.log(newPollRequest)
           }
       }
   });
