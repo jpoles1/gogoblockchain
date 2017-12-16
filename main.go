@@ -39,10 +39,12 @@ func main() {
 	router.PathPrefix("/res").Handler(http.StripPrefix("/res", http.FileServer(http.Dir("res/"))))
 	//UI routing
 	router.HandleFunc("/", homePage).Methods("GET")
+	router.HandleFunc("/vote/{pollID:[0-9]+}/:pollPass", pollAdminPage).Methods("GET")
 	router.HandleFunc("/vote/{pollID:[0-9]+}", pollPage).Methods("GET")
 	router.HandleFunc("/newpoll", newpollPage).Methods("GET")
 	//API routing
 	router.HandleFunc("/api/registerpoll", newPollAPI).Methods("POST")
+	router.HandleFunc("/api/chain", fetchChain).Methods("GET")
 	router.HandleFunc("/api/castvote", voteAPI).Methods("GET")
 	//Start the engines
 	portPtr := flag.String("p", "3333", "Server Port")

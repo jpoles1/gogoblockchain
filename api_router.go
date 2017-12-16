@@ -6,9 +6,19 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 //Main blockchain routing
+func fetchChain(w http.ResponseWriter, r *http.Request) {
+	jsontxt, err := json.Marshal(servBlockchain.Chain)
+	if err != nil {
+		log.Println("Error: " + err.Error())
+		return
+	}
+	w.Write(jsontxt)
+}
+
 func voteAPI(w http.ResponseWriter, r *http.Request) {
 	pollid, ok := r.URL.Query()["pollid"]
 	if !ok || len(pollid) < 1 {
@@ -38,6 +48,8 @@ func newPollAPI(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("#"))
 	}
 	fmt.Println("Adding new poll:", newPoll)
+	pollPass := shaHash(strconv.FormatInt(time.Now().UTC().UnixNano(), 10))
+	newPoll.PassHash = shaHash(pollPass)
 	pollID := createPoll(newPoll)
-	w.Write([]byte("/vote/" + strconv.Itoa(pollID)))
+	w.Write([]byte("/vote/" + strconv.Itoa(pollID) + "/" + pollPass))
 }
