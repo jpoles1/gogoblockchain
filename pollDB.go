@@ -10,9 +10,10 @@ import (
 )
 
 type Poll struct {
-	ID      int
-	Name    string
-	Options []string
+	ID       int
+	Name     string
+	Options  []string
+	PassHash string
 }
 
 var mongoURI string

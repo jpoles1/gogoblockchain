@@ -10,10 +10,29 @@ import (
 
 var renderOpts = map[string]interface{}{"layout": "layouts/base.hbs"}
 
+func renderPage(templateName string, pageData map[string]interface{}, w http.ResponseWriter) {
+	err := template.ExecuteWriter(w, templateName, pageData, renderOpts) // yes you can pass simple maps instead of structs
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	}
+}
 func homePage(w http.ResponseWriter, r *http.Request) {
 	err := template.ExecuteWriter(w, "home.hbs", map[string]interface{}{}, renderOpts) // yes you can pass simple maps instead of structs
 	if err != nil {
 		w.Write([]byte(err.Error()))
+	}
+}
+func pollAdminPage(w http.ResponseWriter, r *http.Request) {
+	urlparams := mux.Vars(r)
+	pollID := urlparams["pollID"]
+	pollStringID, _ := strconv.Atoi(pollID)
+	pollPass := urlparams["pollPass"]
+	pollObj, ok := pollDict[pollStringID]
+	if ok {
+		isAdmin := shaHash(pollPass) == pollObj.PassHash
+		renderPage("vote.hbs", map[string]interface{}{"pollID": pollID, "voteopts": pollObj.Options, "admin": isAdmin}, w)
+	} else {
+		redirectPage(w, "/", "Cannot find poll with this ID!", "1.5")
 	}
 }
 func pollPage(w http.ResponseWriter, r *http.Request) {
@@ -22,6 +41,7 @@ func pollPage(w http.ResponseWriter, r *http.Request) {
 	pollStringID, _ := strconv.Atoi(pollID)
 	pollObj, ok := pollDict[pollStringID]
 	if ok {
+		renderPage("vote.hbs", map[string]interface{}{"pollID": pollID, "voteopts": pollObj.Options}, w)
 		err := template.ExecuteWriter(w, "vote.hbs", map[string]interface{}{"pollID": pollID, "voteopts": pollObj.Options}, renderOpts) // yes you can pass simple maps instead of structs
 		if err != nil {
 			w.Write([]byte(err.Error()))
