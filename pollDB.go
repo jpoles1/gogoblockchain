@@ -29,7 +29,7 @@ func mongoLoad() {
 		log.Fatal("Failed to connect to provided MongoDB URI:\n", err)
 	}
 }
-func createPoll(pollDoc Poll) {
+func createPoll(pollDoc Poll) int {
 	mongoSesh := mongoDB.Copy()
 	defer mongoSesh.Close()
 	pollCt, _ := mongoSesh.DB("blockvote").C("polls").Find(bson.M{}).Count()
@@ -38,12 +38,17 @@ func createPoll(pollDoc Poll) {
 	if err != nil {
 		fmt.Println("Failure to insert poll document:\n", err)
 	}
+	pollDictMutex.Lock()
+	pollDict[pollCt] = pollDoc
+	pollDictMutex.Unlock()
+	return pollCt
 }
 func getPolls() []Poll {
 	mongoSesh := mongoDB.Copy()
 	defer mongoSesh.Close()
 	var pollList []Poll
 	mongoSesh.DB("blockvote").C("polls").Find(bson.M{}).All(&pollList)
+	fmt.Println(pollList)
 	return pollList
 }
 func pollListToDict(pollList []Poll) map[int]Poll {

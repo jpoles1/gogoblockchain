@@ -1,9 +1,13 @@
 <div id="app" class="jumbotron">
-  <div style="display: grid">
+  <div style="display: grid; grid-template-rows: auto auto;">
     <input type="text" name="pollName" v-model="pollName" v-validate="'required'" style="margin: auto; font-size: 32px; text-align: center;" placeholder="Poll Title">
-    <div style="text-align: center; margin-top: 10px;">
-      <div class="alert alert-danger" v-show="errors.has('pollName')" style="display: inline-block">
-        Give the poll a title.
+    <br>
+    <div id="errorbox" style="margin: auto;">
+      <div style="display: inline-block; text-align: center" class="alert alert-danger" role="alert">
+        <div id="errmsg" style="display: inline"></div>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
     </div>
   </div>
@@ -34,18 +38,13 @@
       </tbody>
   </table>
   <hr>
-  <div id="errorbox" class="alert alert-danger" role="alert" style="display: none; text-align: center;">
-    <div id="errmsg" style="display: inline"></div>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
   <div>
       <button class="btn btn-primary" @click="submit" :disabled="errors.any()">Create Poll</button>
   </div>
 </div>
 
 <script type="text/javascript">
+  $("#errorbox").hide()
   Vue.use(VeeValidate);
   var app = new Vue({
       el: "#app",
@@ -57,7 +56,7 @@
           addRow: function() {
               var elem = document.createElement('tr');
               this.rows.push({
-                  name: undefined,
+                  name: "",
               });
           },
           removeElement: function(index) {
@@ -71,20 +70,37 @@
             $("#errorbox #errmsg").html(errMsg)
             $("#errorbox").show()
           },
+          submitCheck: function(newPollRequest){
+            if(newPollRequest.Name == ""){
+              this.showError("Please name the poll.")
+              return false
+            }
+            if(newPollRequest.Options.length < 1){
+              //One
+              this.showError("Please enroll a candidate in the poll.")
+              return false
+            }
+            $("#errorbox").hide()
+            return true
+          },
           submit: function(){
             var newPollRequest = {
               "ID": 0,
               "Name": this.pollName,
-              "Options": this.rows.map(function(x){return x.name}).filter(function(x){return x != undefined})
-            }
-            if(newPollRequest.Name == ""){
-              this.showError("Please name the poll!")
-              return
-            }
-            if(length(newPollRequest.Options) < 1){
-              this.showError("Please name the poll!")
+              "Options": this.rows.map(function(x){return x.name}).filter(function(x){return x != ""})
             }
             console.log(newPollRequest)
+            if(this.submitCheck(newPollRequest)){
+              $.ajax({
+                type: "POST",
+                url: "api/registerpoll",
+                data: JSON.stringify(newPollRequest),
+                contentType: "application/json",
+                success: function(data){
+                    window.location = data
+                }
+              });
+            }
           }
       }
   });
