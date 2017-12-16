@@ -1,5 +1,7 @@
 <div style="text-align: center">
   <h1>Welcome to BlockVote</h1>
+  <br>
+  {{#if isAdmin}}<b>Admin Mode Enabled</b>{{/if}}
   <hr style="margin-bottom: 100px;">
   <div class="jumbotron" style="width: 50%; margin: auto; padding: 30px;">
     <form action="/api/castvote">

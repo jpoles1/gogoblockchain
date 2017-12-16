@@ -29,8 +29,11 @@ func pollAdminPage(w http.ResponseWriter, r *http.Request) {
 	pollPass := urlparams["pollPass"]
 	pollObj, ok := pollDict[pollStringID]
 	if ok {
-		isAdmin := shaHash(pollPass) == pollObj.PassHash
-		renderPage("vote.hbs", map[string]interface{}{"pollID": pollID, "voteopts": pollObj.Options, "admin": isAdmin}, w)
+		if shaHash(pollPass) == pollObj.PassHash {
+			renderPage("vote.hbs", map[string]interface{}{"pollID": pollID, "voteopts": pollObj.Options}, w)
+		} else {
+			redirectPage(w, "/", "Invalid Credentials!", "1.5")
+		}
 	} else {
 		redirectPage(w, "/", "Cannot find poll with this ID!", "1.5")
 	}

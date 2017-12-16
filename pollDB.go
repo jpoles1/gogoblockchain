@@ -49,7 +49,7 @@ func getPolls() []Poll {
 	defer mongoSesh.Close()
 	var pollList []Poll
 	mongoSesh.DB("blockvote").C("polls").Find(bson.M{}).All(&pollList)
-	fmt.Println(pollList)
+	//fmt.Println(pollList)
 	return pollList
 }
 func pollListToDict(pollList []Poll) map[int]Poll {
