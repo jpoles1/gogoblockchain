@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/fatih/color"
 	"github.com/gorilla/mux"
@@ -16,11 +17,14 @@ import (
 var servBlockchain = BlockChain{}.start()
 var nodeIdentifier = uuid.NewV4().String()
 var pollDict map[int]Poll
+var pollDictMutex sync.Mutex
 
 func init() {
 	gotenv.Load()
 	mongoLoad()
+	pollDictMutex.Lock()
 	pollDict = pollListToDict(getPolls())
+	pollDictMutex.Unlock()
 }
 func main() {
 	// Process handlebars templates
@@ -37,8 +41,9 @@ func main() {
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/vote/{pollID:[0-9]+}", pollPage).Methods("GET")
 	router.HandleFunc("/newpoll", newpollPage).Methods("GET")
-	//Main blockchain routing
-	router.HandleFunc("/castvote", voteAPI).Methods("GET")
+	//API routing
+	router.HandleFunc("/api/registerpoll", newPollAPI).Methods("POST")
+	router.HandleFunc("/api/castvote", voteAPI).Methods("GET")
 	//Start the engines
 	portPtr := flag.String("p", "3333", "Server Port")
 	flag.Parse()
