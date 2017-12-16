@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -24,4 +25,10 @@ func voteAPI(w http.ResponseWriter, r *http.Request) {
 	servBlockchain.newTransaction(Transaction{pollid[0], voterid[0], vote[0]})
 	w.Write([]byte("Vote sucessfully recorded."))
 	go servBlockchain.tryToMine()
+}
+func newPollAPI(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()                     // Parses the request body
+	x := r.Form.Get("parameter_name") // x will be "" if parameter is not set
+	fmt.Println(x)
+	w.Write([]byte("Vote sucessfully recorded."))
 }
