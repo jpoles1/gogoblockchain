@@ -36,10 +36,14 @@ func init() {
 	blockchainData, err := ioutil.ReadFile("data/blockchain.json")
 	if err != nil {
 		fmt.Println("Cannot load blockchain backup:", err)
-		servBlockchain.start()
+		servBlockchain = servBlockchain.start()
 		servBlockchain.newBlock(100, "1")
 	} else {
-		json.Unmarshal(blockchainData, servBlockchain)
+		json.Unmarshal(blockchainData, &servBlockchain)
+		servBlockchain = servBlockchain.start()
+		if len(servBlockchain.Chain) < 1 {
+			servBlockchain.newBlock(100, "1")
+		}
 	}
 }
 func main() {
