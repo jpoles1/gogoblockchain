@@ -27,6 +27,7 @@ var pollDictMutex sync.Mutex
 
 func init() {
 	gotenv.Load()
+	initEmail()
 	mongoLoad()
 	//Load list of polls
 	pollDictMutex.Lock()
@@ -93,5 +94,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Saved blockchain. Exiting gracefully...")
+	fmt.Println("Saved blockchain. Exiting gracefully...\n")
 }

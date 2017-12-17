@@ -51,5 +51,8 @@ func newPollAPI(w http.ResponseWriter, r *http.Request) {
 	pollPass := shaHash(strconv.FormatInt(time.Now().UTC().UnixNano(), 10))
 	newPoll.PassHash = shaHash(pollPass)
 	pollID := createPoll(newPoll)
-	w.Write([]byte("/admin/" + strconv.Itoa(pollID) + "/" + pollPass))
+	adminURL := "/admin/" + strconv.Itoa(pollID) + "/" + pollPass
+	fmt.Println("Poll Creation:", newPoll.AdminEmail)
+	sendEmail(newPoll.AdminEmail, "New Poll Created", adminURL)
+	w.Write([]byte(adminURL))
 }
