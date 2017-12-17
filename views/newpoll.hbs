@@ -39,7 +39,9 @@
   </table>
   <hr>
   <div>
-      <button class="btn btn-primary" @click="submit" :disabled="errors.any()">Create Poll</button>
+    <input type="text" name="adminEmail" v-model="adminEmail" v-validate="'required|email'" placeholder="Admin Email">
+    <br>
+    <button class="btn btn-primary" @click="submit" :disabled="errors.any()">Create Poll</button>
   </div>
 </div>
 
@@ -50,7 +52,8 @@
       el: "#app",
       data: {
         pollName: "",
-        rows: [{}]
+        rows: [{}],
+        adminEmail: ""
       },
       methods: {
           addRow: function() {
@@ -87,7 +90,8 @@
             var newPollRequest = {
               "ID": 0,
               "Name": this.pollName,
-              "Options": this.rows.map(function(x){return x.name}).filter(function(x){return x != ""})
+              "Options": this.rows.map(function(x){return x.name}).filter(function(x){return x != ""}),
+              "adminEmail": this.adminEmail
             }
             console.log(newPollRequest)
             if(this.submitCheck(newPollRequest)){
