@@ -23,10 +23,11 @@ type BlockChain struct {
 	minerWaiting        bool
 }
 
-func (bc BlockChain) start() {
+func (bc BlockChain) start() BlockChain {
 	bc.Nodes = NodeSet{make(map[Node]bool)}
 	bc.minerWaiting = false
 	bc.nowMining = &sync.Mutex{}
+	return bc
 }
 
 func (bc BlockChain) proofOfWork(lastProof int) int {
@@ -60,6 +61,7 @@ func (bc *BlockChain) mineBlock() {
 	bc.nowMining.Lock()
 	fmt.Println("Starting Miner")
 	bc.minerWaiting = false
+	fmt.Println(bc)
 	lastBlock := bc.lastBlock()
 	lastProof := lastBlock.Proof
 	proof := bc.proofOfWork(lastProof)

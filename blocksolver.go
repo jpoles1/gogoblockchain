@@ -23,7 +23,7 @@ func (bs *BlockSolver) init(nworkers int, lastProof int) {
 func validProof(lastProof int, proof int) bool {
 	guess := strconv.Itoa(lastProof) + strconv.Itoa(proof)
 	guessHash := shaHash(guess)
-	return guessHash[:4] == "0000"
+	return guessHash[:3] == "000"
 }
 
 //TODO gotta stop workers once sync mutex indicates solution is found
